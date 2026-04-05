@@ -1,0 +1,28 @@
+/*
+  index.css
+  ─────────────────────────────────────────────────────────────────────────────
+  These three @tailwind directives inject Tailwind's styles into your CSS.
+  They MUST be here — without them, no Tailwind classes will work.
+
+  @tailwind base       → CSS reset + sensible browser defaults
+  @tailwind components → pre-built component classes (rarely used directly)
+  @tailwind utilities  → all the utility classes: bg-green-600, px-4, flex, etc.
+
+  You can add your own global styles below these directives.
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles applied to the whole app */
+body {
+  @apply bg-gray-50 text-gray-900;
+  /* @apply lets you use Tailwind classes inside CSS — equivalent to:
+     background-color: #f9fafb; color: #111827; */
+}
+
+/* Smooth transitions for all links and buttons */
+a, button {
+  @apply transition-colors duration-150;
+}

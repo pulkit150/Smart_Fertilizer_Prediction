@@ -76,10 +76,10 @@ export default function Marketplace() {
     }
   };
 
-  // Store cart in sessionStorage so it survives a page navigate-and-back
+  // Store cart in localStorage so it survives page navigation
   // (A full app would use Context or Redux for this)
   const goToCheckout = () => {
-    sessionStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("cart", JSON.stringify(cart));
     navigate("/checkout");
   };
 

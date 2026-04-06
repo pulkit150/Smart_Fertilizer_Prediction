@@ -1,0 +1,37 @@
+{
+  "soil_classes": [
+    "Black",
+    "Clayey",
+    "Loamy",
+    "Red",
+    "Sandy"
+  ],
+  "crop_classes": [
+    "Cotton",
+    "Maize",
+    "Paddy",
+    "Sugarcane",
+    "Tobacco",
+    "Wheat"
+  ],
+  "fert_classes": [
+    "10-26-26",
+    "14-35-14",
+    "28-28",
+    "DAP",
+    "Urea"
+  ],
+  "features": [
+    "Temperature",
+    "Humidity",
+    "Moisture",
+    "Soil_Enc",
+    "Crop_Enc",
+    "Nitrogen",
+    "Potassium",
+    "Phosphorous"
+  ],
+  "test_accuracy": 1.0,
+  "cv_accuracy": 1.0,
+  "n_estimators": 200
+}

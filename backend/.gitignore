@@ -1,0 +1,7 @@
+# Node
+node_modules/
+**/node_modules/
+
+# Environment files (VERY IMPORTANT)
+.env
+**/.env

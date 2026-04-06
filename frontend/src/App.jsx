@@ -30,6 +30,7 @@ import Recommendation from "./pages/Recommendation";
 import Marketplace from "./pages/Marketplace";
 import Dashboard from "./pages/Dashboard";
 import Checkout from "./pages/Checkout";
+import Admin from "./pages/Admin";
 
 // ProtectedRoute: gates a page behind authentication
 // Usage: <ProtectedRoute><Dashboard /></ProtectedRoute>
@@ -37,6 +38,17 @@ const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
   // If not logged in, redirect to /login and remember where they were trying to go
   return user ? children : <Navigate to="/login" replace />;
+};
+
+// AdminRoute: gates a page behind authentication AND admin role
+const AdminRoute = ({ children }) => {
+  const { user } = useAuth();
+  // If not logged in, redirect to /login
+  if (!user) return <Navigate to="/login" replace />;
+  // If logged in but not admin, redirect to home
+  if (user.role !== "admin") return <Navigate to="/" replace />;
+  // If admin, render the page
+  return children;
 };
 
 // AppRoutes is separate from App so it can use useAuth() which needs AuthProvider above it
@@ -67,6 +79,16 @@ const AppRoutes = () => (
             <ProtectedRoute>
               <Checkout />
             </ProtectedRoute>
+          }
+        />
+
+        {/* Admin-only routes — must be logged in as admin */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
           }
         />
 

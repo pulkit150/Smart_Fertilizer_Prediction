@@ -20,10 +20,12 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
 
 export default function Login() {
   const [mode, setMode] = useState("login"); // "login" | "register"
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [userType, setUserType] = useState("farmer"); // "farmer" | "admin" (only during register)
+  const [form, setForm] = useState({ name: "", email: "", password: "", adminSecret: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -58,17 +60,35 @@ export default function Login() {
       setError("Password must be at least 6 characters.");
       return;
     }
+    if (mode === "register" && userType === "admin" && !form.adminSecret) {
+      setError("Admin secret is required to register as admin.");
+      return;
+    }
 
     setLoading(true);
     try {
       if (mode === "login") {
         await login(form.email, form.password);
-      } else {
+        navigate(from, { replace: true });
+      } else if (userType === "farmer") {
+        // Register as farmer
         await register(form.name, form.email, form.password);
+        navigate(from, { replace: true });
+      } else {
+        // Register as admin
+        const { data } = await api.post("/auth/register-admin", {
+          name: form.name,
+          email: form.email,
+          password: form.password,
+          adminSecret: form.adminSecret,
+        });
+        // Store token and user
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        // Update auth context by reloading (or we can trigger a manual update)
+        window.location.href = "/admin"; // Redirect to admin panel
       }
-      navigate(from, { replace: true }); // go to originally requested page
     } catch (err) {
-      // The error message comes from the Express backend's JSON response
       setError(err.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -77,8 +97,9 @@ export default function Login() {
 
   const toggleMode = () => {
     setMode(mode === "login" ? "register" : "login");
+    setUserType("farmer"); // Reset to farmer when toggling
     setError("");
-    setForm({ name: "", email: "", password: "" });
+    setForm({ name: "", email: "", password: "", adminSecret: "" });
   };
 
   return (
@@ -99,6 +120,41 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* User type selector — only shown in register mode */}
+          {mode === "register" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Register As</label>
+              <div className="flex gap-3">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="userType"
+                    value="farmer"
+                    checked={userType === "farmer"}
+                    onChange={(e) => setUserType(e.target.value)}
+                    className="w-4 h-4 text-green-600"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    👨‍🌾 Farmer (Normal User)
+                  </span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="userType"
+                    value="admin"
+                    checked={userType === "admin"}
+                    onChange={(e) => setUserType(e.target.value)}
+                    className="w-4 h-4 text-green-600"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    ⚙️ Admin (Manage Products)
+                  </span>
+                </label>
+              </div>
+            </div>
+          )}
+
           {/* Name field — only shown in register mode */}
           {mode === "register" && (
             <div>
@@ -135,6 +191,27 @@ export default function Login() {
             />
           </div>
 
+          {/* Admin Secret — only shown when registering as admin */}
+          {mode === "register" && userType === "admin" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Admin Secret Key <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="password"
+                name="adminSecret"
+                value={form.adminSecret}
+                onChange={handleChange}
+                placeholder="Enter the admin secret key"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Ask your system administrator for the secret key
+              </p>
+            </div>
+          )}
+
           {/* Error message from server */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
@@ -151,7 +228,7 @@ export default function Login() {
               ? "Please wait..."
               : mode === "login"
               ? "Sign In"
-              : "Create Account"}
+              : `Create ${userType === "admin" ? "Admin" : ""} Account`}
           </button>
         </form>
 

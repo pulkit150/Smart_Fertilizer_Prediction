@@ -51,6 +51,7 @@ export default function Recommendation() {
     pH: 6.5,
     moisture: 50,
     crop: "wheat",
+    soilType: "Loamy",
     city: "Delhi",
   });
 
@@ -167,10 +168,24 @@ export default function Recommendation() {
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">
+                  Soil Type
+                </label>
+                <select
+                  name="soilType"
+                  value={form.soilType}
+                  onChange={handleChange}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-white"
+                >
+                  {["Sandy", "Loamy", "Black", "Red", "Clayey"].map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">
                   Crop Type
                 </label>
-                {/* <select> is a "controlled component" — its value is driven by
-                    React state (form.crop), not the DOM. onChange keeps them in sync. */}
                 <select
                   name="crop"
                   value={form.crop}
@@ -178,9 +193,7 @@ export default function Recommendation() {
                   className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-white"
                 >
                   {CROPS.map((c) => (
-                    <option key={c} value={c}>
-                      {c.charAt(0).toUpperCase() + c.slice(1)}
-                    </option>
+                    <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
                   ))}
                 </select>
               </div>

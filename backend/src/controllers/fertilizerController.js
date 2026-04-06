@@ -1,10 +1,11 @@
 const { getPrediction } = require("../services/mlService");
 const { getWeather } = require("../services/weatherService");
 const Recommendation = require("../models/Recommendation");
+const asyncHandler = require("../middleware/asyncHandler");
 
 // POST /api/fertilizer/recommend
-const getRecommendation = async (req, res) => {
-  const { nitrogen, phosphorus, potassium, pH, moisture, crop, city } = req.body;
+const getRecommendation = asyncHandler(async (req, res) => {
+  const { nitrogen, phosphorus, potassium, pH, moisture, crop, city, soilType } = req.body;
 
   if (!crop) {
     return res.status(400).json({ message: "Crop type is required" });
@@ -13,16 +14,20 @@ const getRecommendation = async (req, res) => {
   // 1. Fetch current weather (auto or from user-provided city)
   const weather = await getWeather(city || "Delhi");
 
-  // 2. Build ML payload
+  // 2. Build ML payload — matches the exact feature schema the model was trained on:
+  //    Temperature, Humidity, Moisture, Soil_Type, Crop_Type,
+  //    Nitrogen, Potassium, Phosphorous
   const mlPayload = {
-    N: nitrogen || 0,
-    P: phosphorus || 0,
-    K: potassium || 0,
+    N: Number(nitrogen) || 0,
+    P: Number(phosphorus) || 0,
+    K: Number(potassium) || 0,
     temperature: weather.temperature,
     humidity: weather.humidity,
-    pH: pH || 7,
+    pH: Number(pH) || 7,
     rainfall: weather.rainfall,
     crop,
+    soil_type: soilType || "Loamy",  // new: passed to ML for soil-type encoding
+    moisture: Number(moisture) || 50, // new: passed as a real feature (21.7% importance)
   };
 
   // 3. Call ML microservice
@@ -33,7 +38,7 @@ const getRecommendation = async (req, res) => {
   if (req.user) {
     savedRec = await Recommendation.create({
       user: req.user._id,
-      soilInput: { nitrogen, phosphorus, potassium, pH, moisture, crop },
+      soilInput: { nitrogen, phosphorus, potassium, pH, moisture, crop, soilType },
       weatherSnapshot: {
         temperature: weather.temperature,
         humidity: weather.humidity,
@@ -54,15 +59,15 @@ const getRecommendation = async (req, res) => {
     recommendations: mlResponse.recommendations,
     recommendationId: savedRec?._id || null,
   });
-};
+});
 
 // GET /api/fertilizer/history — user's past recommendations
-const getHistory = async (req, res) => {
+const getHistory = asyncHandler(async (req, res) => {
   const history = await Recommendation.find({ user: req.user._id })
     .sort({ createdAt: -1 })
     .limit(20);
 
   res.json({ success: true, history });
-};
+});
 
 module.exports = { getRecommendation, getHistory };

@@ -67,6 +67,11 @@ export default function Navbar() {
               <Link to="/dashboard" className={linkClass("/dashboard")}>
                 📊 Dashboard
               </Link>
+              {user.role === "admin" && (
+                <Link to="/admin" className={linkClass("/admin")}>
+                  ⚙️ Admin
+                </Link>
+              )}
               {/* User's name — subtle indicator of who is logged in */}
               <span className="text-green-300 text-xs border border-green-500 px-2 py-1 rounded-full">
                 {user.name}
@@ -116,6 +121,12 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}>
                 📊 Dashboard
               </Link>
+              {user.role === "admin" && (
+                <Link to="/admin" className="block text-green-100 hover:text-white py-1"
+                  onClick={() => setMenuOpen(false)}>
+                  ⚙️ Admin
+                </Link>
+              )}
               <p className="text-green-400 text-xs pb-1">Logged in as {user.name}</p>
               <button onClick={handleLogout}
                 className="block w-full text-left text-red-300 hover:text-red-200 py-1 text-sm">

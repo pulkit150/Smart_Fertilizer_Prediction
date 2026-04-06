@@ -80,4 +80,89 @@ const seedProducts = async (req, res) => {
   res.json({ success: true, message: `${products.length} products seeded`, products });
 };
 
-module.exports = { getProducts, getProductById, seedProducts };
+// POST /api/products — create a new product (admin only)
+const createProduct = async (req, res) => {
+  const { name, brand, description, nutrients, price, stock, category, suitableCrops } = req.body;
+
+  if (!name || !brand || !price) {
+    return res.status(400).json({ message: "Name, brand, and price are required" });
+  }
+
+  try {
+    const product = await Product.create({
+      name,
+      brand,
+      description,
+      nutrients: nutrients || { nitrogen: 0, phosphorus: 0, potassium: 0 },
+      price,
+      stock: stock || 100,
+      category: category || "general",
+      suitableCrops: suitableCrops || [],
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      product,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// PUT /api/products/:id — update product (admin only)
+const updateProduct = async (req, res) => {
+  const { id } = req.params;
+  const { name, brand, description, nutrients, price, stock, category, suitableCrops } = req.body;
+
+  try {
+    const product = await Product.findByIdAndUpdate(
+      id,
+      {
+        name,
+        brand,
+        description,
+        nutrients,
+        price,
+        stock,
+        category,
+        suitableCrops,
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Product updated successfully",
+      product,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// DELETE /api/products/:id — delete product (admin only)
+const deleteProduct = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Product deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getProducts, getProductById, seedProducts, createProduct, updateProduct, deleteProduct };

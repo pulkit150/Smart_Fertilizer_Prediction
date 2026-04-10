@@ -23,11 +23,16 @@
 
 import { useState } from "react";
 
+// RULE: Keep this list in sync with the ML training data.
+// Any crop here that the model hasn't seen gets mapped to the nearest known class.
+// Currently trained on: Cotton, Maize, Paddy, Sugarcane, Tobacco, Wheat, Banana, Potato
 const CROPS = [
-  "wheat", "rice", "maize", "sugarcane", "cotton",
-  "potato", "tomato", "banana", "soybean", "chickpea",
-  "groundnut", "mustard",
+  "wheat", "maize", "paddy", "sugarcane", "cotton", "tobacco",
+  "banana", "potato",  // ← added when MOP was introduced (MOP targets high-K crops)
 ];
+
+// Soil types the model knows. Must match training_data.csv exactly (case-sensitive).
+const SOIL_TYPES = ["Sandy", "Loamy", "Black", "Red", "Clayey"];
 
 // Default starting values — realistic mid-range soil readings
 const INITIAL_FORM = {
@@ -37,6 +42,7 @@ const INITIAL_FORM = {
   pH: 6.5,
   moisture: 50,
   crop: "wheat",
+  soilType: "Loamy",  // ← added: model uses this as a feature (0.6% importance)
   city: "Delhi",
 };
 
@@ -109,6 +115,18 @@ export default function FertilizerForm({ onSubmit, loading }) {
           <span>🌾</span> Crop & Location
         </h2>
         <div className="space-y-3">
+          {/* Soil Type — used by the ML model as a feature */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">Soil Type</label>
+            <select
+              name="soilType" value={form.soilType} onChange={handleChange}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+              {SOIL_TYPES.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Crop Type</label>
             <select

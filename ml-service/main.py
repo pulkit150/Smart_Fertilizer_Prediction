@@ -74,6 +74,12 @@ FERT_DETAILS = {
                 "and reproductive stages. Widely used for paddy and wheat at tillering.",
         "apply_when": "When N is adequate but P and K are deficient — common in paddy systems.",
     },
+    "MOP": {
+        "npk": "0-0-60", "N": 0, "P": 0, "K": 60, "type": "chemical",
+        "desc": "Muriate of Potash — 60% potassium. Strengthens cell walls, "
+                "improves drought resistance, and enhances fruit quality.",
+        "apply_when": "When soil potassium is deficient, especially for banana and potato.",
+    },
 }
 
 FERT_DISPLAY = {
@@ -82,6 +88,7 @@ FERT_DISPLAY = {
     "14-35-14": "Complex NPK 14-35-14",
     "28-28"   : "Complex NPK 28-28-0",
     "10-26-26": "Complex NPK 10-26-26",
+    "MOP": "MOP — Muriate of Potash (0-0-60)",
 }
 
 # ── Schemas ───────────────────────────────────────────────────────────────────

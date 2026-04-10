@@ -97,3 +97,8 @@ Temperature,Humidity,Moisture,Soil_Type,Crop_Type,Nitrogen,Potassium,Phosphorous
 32,65,56,Loamy,Tobacco,0,0,0,10-26-26
 28,64,34,Red,Cotton,24,0,14,28-28
 26,62,50,Clayey,Maize,35,0,0,Urea
+28,60,55,Sandy,Banana,5,60,5,MOP
+30,58,50,Red,Banana,3,55,3,MOP
+26,65,48,Loamy,Banana,2,58,2,MOP
+31,55,50,Sandy,Potato,8,55,8,MOP
+28,58,48,Red,Potato,6,58,6,MOP

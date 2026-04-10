@@ -27,11 +27,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
 
-// All crop options the ML service understands
+// ── Crop list ──────────────────────────────────────────────────────────────
+// RULE: Any crop you add here MUST also exist in the ML training data.
+// If the model hasn't seen a crop, it maps it to the closest known class.
+// Currently trained on: Cotton, Maize, Paddy, Sugarcane, Tobacco, Wheat,
+//                       Banana, Potato  (added when MOP was introduced)
 const CROPS = [
-  "wheat", "rice", "maize", "sugarcane", "cotton",
-  "potato", "tomato", "banana", "soybean", "chickpea",
-  "mustard", "groundnut", "onion", "garlic",
+  "wheat", "maize", "paddy", "sugarcane", "cotton", "tobacco",
+  "banana", "potato",   // ← MOP targets these two — added along with MOP
 ];
 
 // Medal emojis and card styles for 1st, 2nd, 3rd place

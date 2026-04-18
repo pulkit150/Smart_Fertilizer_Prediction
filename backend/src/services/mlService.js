@@ -10,7 +10,7 @@ const ML_URL = process.env.ML_SERVICE_URL || "http://localhost:8000";
 const getPrediction = async (inputData) => {
   try {
     const response = await axios.post(`${ML_URL}/predict`, inputData, {
-      timeout: 10000, // 10 second timeout
+      timeout: 30000, // 30 second timeout
     });
     return response.data;
   } catch (error) {

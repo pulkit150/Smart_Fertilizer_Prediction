@@ -21,7 +21,21 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  process.env.FRONTEND_URL,           // e.g. https://fertismart.onrender.com
+  "http://localhost:5173",            // Vite dev server
+  "http://localhost:4173",            // Vite preview
+].filter(Boolean); // removes undefined if FRONTEND_URL not set
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (mobile apps, Postman, curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 
 // Routes
@@ -34,7 +48,11 @@ app.use("/api/weather", weatherRoutes);
 app.use("/api/feedback", feedbackRoutes);
 
 // Health check
-app.get("/", (req, res) => res.json({ message: "Smart Fertilizer API running" }));
+app.get("/", (req, res) => res.json({
+  message: "FertiSmart API running",
+  version: "1.0.0",
+  env: process.env.NODE_ENV,
+}));
 
 // Global error handler (must be last)
 app.use(errorHandler);

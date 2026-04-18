@@ -224,7 +224,7 @@ def predict(soil: SoilInput):
         X = np.array([[
             soil.temperature, soil.humidity, soil.moisture,
             soil_enc, crop_enc,
-            soil.N, soil.K, soil.P   # ← note K before P (matches dataset column order)
+            soil.N, soil.P, soil.K  # ← note K before P (matches dataset column order)
         ]])
 
         pred_idx   = RF_MODEL.predict(X)[0]
